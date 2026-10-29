@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}FarmDirect — Direct Market Access for Farmers{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <a href="{{ url_for('index') }}" class="brand" data-i18n="brand_name">
+      🌱 FarmDirect
+    </a>
+
+    <nav class="nav-menu">
+      <a href="{{ url_for('index') }}" class="nav-link" data-i18n="nav_home">Marketplace</a>
+      <a href="{{ url_for('schemes') }}" class="nav-link" data-i18n="nav_schemes">Government Schemes</a>
+
+      <!-- Shopping Cart Button -->
+      <a href="{{ url_for('view_cart') }}" class="nav-link" style="display: flex; align-items: center; gap: 4px;">
+        🛒 <span data-i18n="nav_cart">Cart</span>
+        <span class="cart-badge">{{ session.get('cart', {})|length }}</span>
+      </a>
+
+      {% if session.get('user_id') %}
+        <a href="{{ url_for('dashboard') }}" class="nav-link" data-i18n="nav_dashboard">Dashboard</a>
+        {% if session.get('role') == 'farmer' %}
+          <a href="{{ url_for('add_produce') }}" class="btn btn-sm btn-alt" data-i18n="nav_sell">+ Sell Produce</a>
+        {% endif %}
+        <span style="font-size: 0.88rem; color: var(--dark); font-weight: 700;">👤 {{ session.name }}</span>
+        <a href="{{ url_for('logout') }}" class="btn btn-sm" data-i18n="nav_logout">Logout</a>
+      {% else %}
+        <a href="{{ url_for('login') }}" class="nav-link" data-i18n="nav_login">Login</a>
+        <a href="{{ url_for('register') }}" class="btn btn-sm" data-i18n="nav_register">Join Now</a>
+      {% endif %}
+
+      <!-- Multi-Language Selector -->
+      <select class="lang-select" aria-label="Select Language">
+        <option value="en">English (EN)</option>
+        <option value="ta">தமிழ் (Tamil)</option>
+        <option value="hi">हिंदी (Hindi)</option>
+        <option value="te">తెలుగు (Telugu)</option>
+        <option value="kn">ಕನ್ನಡ (Kannada)</option>
+        <option value="ml">മലയാളം (Malayalam)</option>
+      </select>
+    </nav>
+  </header>
+
+  <!-- Flash Alert Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="flash-msg {{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Main Content Block -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div>
+      <span data-i18n="footer_text">🌱 <b>FarmDirect</b> — Direct Market Access Platform for Farmers.</span>
+    </div>
+    <div style="display: flex; gap: 20px;">
+      <a href="{{ url_for('index') }}" data-i18n="nav_home">Marketplace</a>
+      <a href="{{ url_for('schemes') }}" data-i18n="nav_schemes">Government Schemes</a>
+      <a href="{{ url_for('register') }}" data-i18n="nav_register">Join Now</a>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

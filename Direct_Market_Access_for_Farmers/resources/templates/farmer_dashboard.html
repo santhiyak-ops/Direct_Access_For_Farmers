@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block title %}Farmer Portal | FarmDirect{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="dash-header">
+    <div class="dash-title">
+      <span class="badge">FARMER PORTAL</span>
+      <h1>Welcome, {{ session.name }}</h1>
+      <p style="color: var(--muted); font-size: 0.95rem;">Manage crop listings, price offers from buyers, and rangewise order dispatches.</p>
+    </div>
+    <a href="{{ url_for('add_produce') }}" class="btn">+ List New Produce</a>
+  </div>
+
+  <!-- Metrics Grid -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <p>💰 Total Direct Sales</p>
+      <h3>₹{{ "%.2f"|format(total_sales) }}</h3>
+    </div>
+    <div class="metric-card">
+      <p>🌾 Active Produce Listings</p>
+      <h3>{{ produce|length }} Items</h3>
+    </div>
+    <div class="metric-card">
+      <p>🤝 Pending Price Offers</p>
+      <h3>{{ offers|selectattr('status','equalto','Pending')|list|length }} Offers</h3>
+    </div>
+    <div class="metric-card">
+      <p>📦 Orders Received</p>
+      <h3>{{ orders|length }} Orders</h3>
+    </div>
+  </div>
+
+  <!-- Produce Listings Panel -->
+  <div class="data-panel">
+    <h2>
+      <span>🌾 My Active Crop Listings</span>
+      <a href="{{ url_for('add_produce') }}" class="btn btn-sm btn-alt">+ Add Crop</a>
+    </h2>
+
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Crop Name</th>
+            <th>Category</th>
+            <th>Stock Left</th>
+            <th>Price / Unit</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in produce %}
+            <tr>
+              <td><strong>{{ item.name }}</strong></td>
+              <td>{{ item.category }}</td>
+              <td>{{ item.quantity }} {{ item.unit }}</td>
+              <td>₹{{ "%.2f"|format(item.price) }} / {{ item.unit }}</td>
+              <td>📍 {{ item.location }}</td>
+              <td><span class="status-badge status-available">{{ item.status }}</span></td>
+              <td><a href="{{ url_for('produce_detail', produce_id=item.id) }}" class="btn btn-sm btn-alt">View</a></td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--muted); padding: 24px;">No produce listed yet. Click "+ Add New Crop" to list your harvest!</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Direct Customer Orders & Rangewise Delivery Panel -->
+  <div class="data-panel">
+    <h2>🚚 Customer Orders & Rangewise Delivery Management</h2>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Buyer & Destination</th>
+            <th>Produce</th>
+            <th>Delivery Range</th>
+            <th>Total Paid</th>
+            <th>Delivery Status</th>
+            <th>Update Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ord in orders %}
+            <tr>
+              <td>#ORD-{{ ord.id }}</td>
+              <td>
+                <strong>{{ ord.buyer_name }}</strong><br>
+                <small style="color: var(--muted);">📍 {{ ord.buyer_location or 'Local' }} · 📞 {{ ord.buyer_phone or 'N/A' }}</small>
+              </td>
+              <td>{{ ord.produce_name }} ({{ ord.quantity }})</td>
+              <td>
+                <span style="font-weight: 600; color: var(--primary);">{{ ord.delivery_range or 'Local (0 - 25 km)' }}</span><br>
+                <small style="color: var(--muted);">Freight Fee: ₹{{ "%.0f"|format(ord.delivery_fee or 50) }}</small>
+              </td>
+              <td><strong style="color: var(--dark);">₹{{ "%.2f"|format(ord.total) }}</strong></td>
+              <td>
+                <span class="status-badge status-{{ 'accepted' if ord.delivery_status == 'Delivered to Buyer' else 'pending' }}">
+                  🚚 {{ ord.delivery_status or 'Processing' }}
+                </span>
+              </td>
+              <td>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  {% if ord.delivery_status != 'Delivered to Buyer' %}
+                    <a href="{{ url_for('update_delivery_status', order_id=ord.id, delivery_status='Dispatched for Delivery Range') }}" class="btn btn-sm btn-alt" style="font-size: 0.75rem; padding: 3px 8px;">Dispatched</a>
+                    <a href="{{ url_for('update_delivery_status', order_id=ord.id, delivery_status='In-Transit (Regional Freight)') }}" class="btn btn-sm btn-alt" style="font-size: 0.75rem; padding: 3px 8px;">In Transit</a>
+                    <a href="{{ url_for('update_delivery_status', order_id=ord.id, delivery_status='Delivered to Buyer') }}" class="btn btn-sm" style="font-size: 0.75rem; padding: 3px 8px; background: #137333;">Mark Delivered</a>
+                  {% else %}
+                    <span style="font-size: 0.8rem; color: #137333; font-weight: 700;">✔ Completed</span>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--muted); padding: 24px;">No orders placed yet.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Price Negotiation Offers Panel -->
+  <div class="data-panel">
+    <h2>🤝 Incoming Price Offers from Buyers</h2>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Buyer Name</th>
+            <th>Produce Item</th>
+            <th>Offered Price</th>
+            <th>Buyer Note</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for off in offers %}
+            <tr>
+              <td>
+                <strong>{{ off.buyer_name }}</strong><br>
+                <small style="color: var(--muted);">📞 {{ off.buyer_phone or 'N/A' }}</small>
+              </td>
+              <td>{{ off.produce_name }}</td>
+              <td><strong style="color: var(--primary);">₹{{ "%.2f"|format(off.offered_price) }}</strong></td>
+              <td><span style="font-size: 0.85rem; color: var(--muted);">{{ off.message or 'No message' }}</span></td>
+              <td>
+                <span class="status-badge status-{{ off.status|lower }}">{{ off.status }}</span>
+              </td>
+              <td>
+                {% if off.status == 'Pending' %}
+                  <a href="{{ url_for('update_offer', offer_id=off.id, status='Accepted') }}" class="btn btn-sm" style="background: #137333;">Accept</a>
+                  <a href="{{ url_for('update_offer', offer_id=off.id, status='Rejected') }}" class="btn btn-sm" style="background: #c5221f;">Reject</a>
+                {% else %}
+                  <span style="font-size: 0.82rem; color: var(--muted);">Resolved</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--muted); padding: 24px;">No incoming negotiation offers currently.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

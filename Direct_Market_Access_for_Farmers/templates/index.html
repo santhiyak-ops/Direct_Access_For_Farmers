@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}FarmDirect | Direct Market Access for Farmers{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+  <div>
+    <span class="badge" data-i18n="hero_badge">DIRECT FROM FARM TO MARKET</span>
+    <h1 data-i18n="hero_title">Better markets for farmers.<br><span data-i18n="hero_title_sub">Fresher produce for everyone.</span></h1>
+    <p data-i18n="hero_desc">Connect directly with local farmers and buyers. List crops, negotiate transparent prices, and access government support schemes effortlessly.</p>
+    
+    <div class="hero-actions">
+      <a href="#marketplace" class="btn" data-i18n="hero_btn_explore">Explore Marketplace →</a>
+      <a href="{{ url_for('register') }}" class="btn btn-alt" data-i18n="hero_btn_sell">Start Selling Today</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <h3>100%</h3>
+        <p data-i18n="stat_direct_sub">Direct Farmer Trade</p>
+      </div>
+      <div class="stat-item">
+        <h3>0%</h3>
+        <p data-i18n="stat_price_sub">Middlemen Commission</p>
+      </div>
+      <div class="stat-item">
+        <h3>15+</h3>
+        <p data-i18n="stat_schemes_sub">Govt Welfare Schemes</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-banner-card">
+    <div style="font-size: 3rem; margin-bottom: 10px;">🌾🚜 🍅</div>
+    <h3 style="color: var(--dark); font-weight: 800;" data-i18n="hero_banner_title">Direct Farm Trade Network</h3>
+    <p style="color: var(--muted); font-size: 0.9rem; margin-top: 4px;" data-i18n="hero_banner_desc">Empowering agricultural producers with transparent price discovery and buyer connections.</p>
+    
+    <div class="advisory-box">
+      <h4 data-i18n="advisory_title">☀️ Today's Agri Market & Weather Advisory</h4>
+      <p data-i18n="advisory_desc">High demand expected for Tomatoes and Samba Rice. Favorable harvest weather across South regions.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Marketplace Section -->
+<section class="section" id="marketplace">
+  <div class="section-header">
+    <div class="section-title">
+      <h2 data-i18n="market_title">Fresh Produce from Local Farms</h2>
+      <p data-i18n="market_desc">Direct access to harvest fresh crops at fair, competitive prices.</p>
+    </div>
+    <a href="{{ url_for('schemes') }}" class="btn btn-alt btn-sm" data-i18n="nav_schemes">🏛️ View Government Schemes</a>
+  </div>
+
+  <!-- Search & Category Filters -->
+  <div class="search-filter-bar">
+    <form action="{{ url_for('index') }}#marketplace" method="GET" class="search-form">
+      {% if current_category %}
+        <input type="hidden" name="category" value="{{ current_category }}">
+      {% endif %}
+      <input type="text" name="search" class="input-field" placeholder="Search crops, vegetables, location..." value="{{ search_query }}" data-i18n="search_placeholder">
+      <button type="submit" class="btn btn-sm" data-i18n="btn_search">Search</button>
+    </form>
+
+    <div class="category-chips">
+      <a href="{{ url_for('index') }}#marketplace" class="chip {% if not current_category %}active{% endif %}" data-i18n="all_categories">All Categories</a>
+      {% for cat in categories %}
+        <a href="{{ url_for('index', category=cat) }}#marketplace" class="chip {% if current_category == cat %}active{% endif %}" data-i18n-cat="{{ cat }}">{{ cat }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Produce Cards Grid -->
+  <div class="crop-grid">
+    {% for item in produce %}
+      <article class="crop-card">
+        <div class="crop-card-img">
+          <span>{{ item.image_url if item.image_url and item.image_url|length <= 4 else ('🍅' if item.category == 'Vegetables' else ('🌾' if item.category == 'Grains & Cereals' else ('🥭' if item.category == 'Fruits' else '🥬'))) }}</span>
+          <span class="crop-category-tag" data-i18n-cat="{{ item.category }}">{{ item.category }}</span>
+        </div>
+        <div class="crop-card-body">
+          <div>
+            <h3 class="crop-title" data-i18n-crop="{{ item.name }}">{{ item.name }}</h3>
+            <p class="crop-farmer">📍 {{ item.location }} · 👨‍🌾 {{ item.farmer_name }}</p>
+            <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 12px; height: 38px; overflow: hidden;" data-i18n-desc="{{ item.description }}">{{ item.description }}</p>
+          </div>
+          <div>
+            <div class="crop-price-row">
+              <span class="crop-price">₹{{ "%.2f"|format(item.price) }} <small style="font-size: 0.8rem; color: var(--muted);">/ <span data-i18n-unit="{{ item.unit }}">{{ item.unit }}</span></small></span>
+              <span class="crop-stock"><span data-i18n="lbl_stock">Stock:</span> {{ item.quantity }} <span data-i18n-unit="{{ item.unit }}">{{ item.unit }}</span></span>
+            </div>
+            <a href="{{ url_for('produce_detail', produce_id=item.id) }}" class="btn btn-sm" style="width: 100%; margin-top: 14px;" data-i18n="btn_view_buy">View & Buy</a>
+          </div>
+        </div>
+      </article>
+    {% else %}
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: #ffffff; border-radius: 16px; border: 1px solid var(--border);">
+        <p style="color: var(--muted);" data-i18n="no_produce_match">No produce items match your search filter.</p>
+        <a href="{{ url_for('seed') }}" class="btn btn-sm btn-alt" style="margin-top: 12px;" data-i18n="btn_load_demo">🌱 Load Demo Produce & Seed Data</a>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

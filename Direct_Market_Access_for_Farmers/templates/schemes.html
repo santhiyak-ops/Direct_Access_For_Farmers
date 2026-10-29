@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Government Agricultural Schemes | FarmDirect{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: 40px;">
+  <div class="section-header">
+    <div class="section-title">
+      <span class="badge">AGRICULTURAL WELFARE</span>
+      <h2 data-i18n="schemes_title">Government Agricultural Welfare Schemes</h2>
+      <p data-i18n="schemes_desc">Explore financial support, crop insurance, equipment subsidies, and market link initiatives.</p>
+    </div>
+    <a href="{{ url_for('index') }}" class="btn btn-alt btn-sm">← Back to Marketplace</a>
+  </div>
+
+  <!-- Search & Category Filters for Schemes -->
+  <div class="search-filter-bar">
+    <form action="{{ url_for('schemes') }}" method="GET" class="search-form">
+      {% if current_category %}
+        <input type="hidden" name="category" value="{{ current_category }}">
+      {% endif %}
+      <input type="text" name="search" class="input-field" placeholder="Search schemes (PM-KISAN, Insurance, Credit...)" value="{{ search_query }}">
+      <button type="submit" class="btn btn-sm" data-i18n="btn_search">Search</button>
+    </form>
+
+    <div class="category-chips">
+      <a href="{{ url_for('schemes') }}" class="chip {% if not current_category %}active{% endif %}" data-i18n="all_categories">All Schemes</a>
+      {% for cat in categories %}
+        <a href="{{ url_for('schemes', category=cat) }}" class="chip {% if current_category == cat %}active{% endif %}">{{ cat }}</a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Schemes Grid -->
+  <div class="scheme-grid">
+    {% for scheme in schemes %}
+      <article class="scheme-card">
+        <div class="scheme-header">
+          <div class="scheme-icon">{{ scheme.icon }}</div>
+          <div>
+            <span class="crop-category-tag" style="position: static; margin-bottom: 4px;">{{ scheme.category }}</span>
+            <h3 class="scheme-title">{{ scheme.title }}</h3>
+          </div>
+        </div>
+        
+        <p class="scheme-desc">{{ scheme.description }}</p>
+
+        <div class="scheme-detail-box">
+          <strong>📋 Eligibility:</strong>
+          <span>{{ scheme.eligibility }}</span>
+        </div>
+
+        <div class="scheme-detail-box" style="background: #eef6f0;">
+          <strong style="color: var(--primary);">🎁 Key Benefits:</strong>
+          <span>{{ scheme.benefits }}</span>
+        </div>
+
+        {% if scheme.application_link %}
+          <a href="{{ scheme.application_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-alt" style="width: 100%; margin-top: 10px;">
+            🔗 Apply on Official Portal →
+          </a>
+        {% endif %}
+      </article>
+    {% else %}
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: #ffffff; border-radius: 16px; border: 1px solid var(--border);">
+        <p style="color: var(--muted);">No schemes found matching your search query.</p>
+        <a href="{{ url_for('schemes') }}" class="btn btn-sm btn-alt" style="margin-top: 10px;">View All Schemes</a>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Checkout & Payment | FarmDirect{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: 40px;">
+  <div class="section-header">
+    <div class="section-title">
+      <span class="badge" data-i18n="checkout_badge">SECURE PAYMENT</span>
+      <h2 data-i18n="checkout_title">Checkout & Payment Gateway</h2>
+      <p data-i18n="checkout_desc">Complete your shipping address and choose a payment method for direct farm order dispatch.</p>
+    </div>
+    <a href="{{ url_for('view_cart') }}" class="btn btn-alt btn-sm" data-i18n="btn_back_to_cart">← Back to Cart</a>
+  </div>
+
+  <form action="{{ url_for('checkout') }}" method="POST">
+    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 35px; align-items: start;">
+      
+      <!-- Left Column: Shipping Address & Payment Gateway Selection -->
+      <div>
+        <!-- Shipping Address Form -->
+        <div class="action-card" style="margin-top: 0;">
+          <h3 style="color: var(--dark); font-size: 1.2rem; margin-bottom: 16px;" data-i18n="shipping_details_title">🚚 Shipping & Delivery Destination</h3>
+          
+          <div class="form-group">
+            <label for="shipping_address" data-i18n="lbl_shipping_address">Delivery Address (House No, Street, Village/City, Pincode):</label>
+            <textarea id="shipping_address" name="shipping_address" class="input-field" rows="3" placeholder="Enter complete delivery address..." data-i18n="ph_shipping_address" required></textarea>
+          </div>
+        </div>
+
+        <!-- Payment Method Selection -->
+        <div class="action-card" style="margin-top: 24px;">
+          <h3 style="color: var(--dark); font-size: 1.2rem; margin-bottom: 16px;" data-i18n="payment_gateway_title">💳 Select Payment Gateway Method</h3>
+          
+          <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; background: #fafdfb;">
+              <input type="radio" name="payment_method" value="UPI / GPay / PhonePe" checked>
+              <div>
+                <strong>📲 UPI / GPay / PhonePe / Paytm</strong><br>
+                <small style="color: var(--muted);" data-i18n="pm_upi_desc">Instant bank transfer via UPI ID or QR Scan</small>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; background: #fafdfb;">
+              <input type="radio" name="payment_method" value="Credit / Debit Card">
+              <div>
+                <strong>💳 Credit / Debit Card (Visa, MasterCard, RuPay)</strong><br>
+                <small style="color: var(--muted);" data-i18n="pm_card_desc">Secure payment with 16-digit card and OTP</small>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; background: #fafdfb;">
+              <input type="radio" name="payment_method" value="Net Banking">
+              <div>
+                <strong>🏦 Net Banking</strong><br>
+                <small style="color: var(--muted);" data-i18n="pm_net_desc">SBI, HDFC, ICICI, Axis, Canara & all major banks</small>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: #fafdfb;">
+              <input type="radio" name="payment_method" value="Kisan Credit Card / Cash on Delivery">
+              <div>
+                <strong>🌾 Kisan Credit Card (KCC) / Cash on Delivery (COD)</strong><br>
+                <small style="color: var(--muted);" data-i18n="pm_kcc_desc">Pay using Kisan credit account or upon delivery arrival</small>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Order Items Summary & Pay Button -->
+      <div class="action-card" style="margin-top: 0; background: #ffffff;">
+        <h3 style="color: var(--dark); font-size: 1.15rem; margin-bottom: 16px;" data-i18n="checkout_summary_title">Order Items Summary</h3>
+
+        <div style="margin-bottom: 20px; max-height: 260px; overflow-y: auto;">
+          {% for item in cart_items %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border);">
+              <div>
+                <strong style="font-size: 0.92rem; color: var(--dark);">{{ item.name }}</strong><br>
+                <small style="color: var(--muted);">{{ item.quantity }} {{ item.unit }} · {{ item.delivery_range }}</small>
+              </div>
+              <span style="font-weight: 700; color: var(--primary);">₹{{ "%.2f"|format(item.item_total) }}</span>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--muted); margin-bottom: 6px;">
+          <span data-i18n="subtotal_lbl">Produce Subtotal:</span>
+          <span style="font-weight: 600; color: var(--dark);">₹{{ "%.2f"|format(subtotal) }}</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--muted); margin-bottom: 14px;">
+          <span data-i18n="delivery_fee_lbl">Rangewise Freight Fee:</span>
+          <span style="font-weight: 600; color: var(--primary);">₹{{ "%.2f"|format(delivery_fee) }}</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 2px dashed var(--border); margin-bottom: 24px;">
+          <span style="font-weight: 800; color: var(--dark); font-size: 1.1rem;" data-i18n="total_payable_lbl">Total Amount Payable:</span>
+          <span style="font-size: 1.6rem; font-weight: 800; color: var(--primary);">₹{{ "%.2f"|format(grand_total) }}</span>
+        </div>
+
+        <button type="submit" class="btn" style="width: 100%; padding: 14px; font-size: 1.05rem;" data-i18n="btn_pay_now">🔒 Pay Now & Confirm Orders</button>
+      </div>
+
+    </div>
+  </form>
+</section>
+{% endblock %}

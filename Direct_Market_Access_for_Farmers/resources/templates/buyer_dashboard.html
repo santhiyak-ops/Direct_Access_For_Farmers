@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Buyer Dashboard | FarmDirect{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="dash-header">
+    <div class="dash-title">
+      <span class="badge">BUYER PORTAL</span>
+      <h1>Welcome, {{ session.name }}</h1>
+      <p style="color: var(--muted); font-size: 0.95rem;">Track your farm direct orders, rangewise freight delivery, and negotiation offers.</p>
+    </div>
+    <a href="{{ url_for('index') }}" class="btn">🛒 Browse Marketplace</a>
+  </div>
+
+  <!-- Metrics Grid -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <p>🛍️ Total Produce Purchases</p>
+      <h3>₹{{ "%.2f"|format(total_spent) }}</h3>
+    </div>
+    <div class="metric-card">
+      <p>📦 Total Orders Placed</p>
+      <h3>{{ orders|length }} Orders</h3>
+    </div>
+    <div class="metric-card">
+      <p>💬 Price Negotiate Offers</p>
+      <h3>{{ offers|length }} Offers</h3>
+    </div>
+  </div>
+
+  <!-- Buyer Orders & Delivery Tracker Panel -->
+  <div class="data-panel">
+    <h2>🚚 My Orders & Rangewise Delivery Status Tracker</h2>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Produce Item</th>
+            <th>Farmer Contact</th>
+            <th>Delivery Range Zone</th>
+            <th>Freight Fee</th>
+            <th>Total Paid</th>
+            <th>Delivery Progress</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ord in orders %}
+            <tr>
+              <td>#ORD-{{ ord.id }}</td>
+              <td><strong>{{ ord.produce_name }}</strong> ({{ ord.quantity }} {{ ord.unit }})</td>
+              <td>
+                👨‍🌾 {{ ord.farmer_name }}<br>
+                <small style="color: var(--muted);">📞 {{ ord.farmer_phone or 'N/A' }}</small>
+              </td>
+              <td>📍 {{ ord.delivery_range or 'Local (0 - 25 km)' }}</td>
+              <td>₹{{ "%.2f"|format(ord.delivery_fee or 50) }}</td>
+              <td><strong style="color: var(--primary);">₹{{ "%.2f"|format(ord.total) }}</strong></td>
+              <td>
+                <span class="status-badge status-{{ 'accepted' if ord.delivery_status == 'Delivered to Buyer' else 'pending' }}">
+                  🚚 {{ ord.delivery_status or 'Processing' }}
+                </span>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--muted); padding: 24px;">You haven't placed any orders yet. <a href="{{ url_for('index') }}" style="color: var(--primary); font-weight: 700;">Explore fresh farm produce!</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Negotiation Tracker Panel -->
+  <div class="data-panel">
+    <h2>💬 Sent Price Offers & Negotiations</h2>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Produce</th>
+            <th>Farmer</th>
+            <th>Listed Price</th>
+            <th>My Offered Price</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for off in offers %}
+            <tr>
+              <td><strong>{{ off.produce_name }}</strong></td>
+              <td>👨‍🌾 {{ off.farmer_name }}</td>
+              <td>₹{{ "%.2f"|format(off.listed_price) }}</td>
+              <td><strong style="color: var(--primary);">₹{{ "%.2f"|format(off.offered_price) }}</strong></td>
+              <td><span class="status-badge status-{{ off.status|lower }}">{{ off.status }}</span></td>
+              <td>{{ off.created_at }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--muted); padding: 24px;">No negotiation offers sent.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

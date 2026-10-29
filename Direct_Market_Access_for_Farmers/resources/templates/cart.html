@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Shopping Cart | FarmDirect{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top: 40px;">
+  <div class="section-header">
+    <div class="section-title">
+      <span class="badge" data-i18n="cart_badge">ORDER CART</span>
+      <h2 data-i18n="cart_title">Your Produce Shopping Cart</h2>
+      <p data-i18n="cart_desc">Review harvest produce, quantity, and rangewise delivery options before checkout.</p>
+    </div>
+    <a href="{{ url_for('index') }}" class="btn btn-alt btn-sm" data-i18n="btn_continue_shopping">← Continue Shopping</a>
+  </div>
+
+  {% if cart_items %}
+    <form action="{{ url_for('update_cart') }}" method="POST">
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; align-items: start;">
+        <!-- Cart Items Table -->
+        <div class="data-panel" style="margin-bottom: 0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="th_crop">Produce</th>
+                  <th data-i18n="th_price">Unit Price</th>
+                  <th data-i18n="th_quantity">Quantity</th>
+                  <th data-i18n="th_delivery_range">Delivery Range</th>
+                  <th data-i18n="th_total">Total</th>
+                  <th data-i18n="th_action">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in cart_items %}
+                  <tr>
+                    <td>
+                      <strong>{{ item.name }}</strong><br>
+                      <small style="color: var(--muted);">👨‍🌾 {{ item.farmer_name }}</small>
+                    </td>
+                    <td>₹{{ "%.2f"|format(item.price) }} / {{ item.unit }}</td>
+                    <td>
+                      <input type="number" step="0.1" min="0.1" max="{{ item.stock }}" name="qty_{{ item.produce_id }}" class="input-field" value="{{ item.quantity }}" style="width: 80px; padding: 6px;">
+                    </td>
+                    <td>
+                      <select name="range_{{ item.produce_id }}" class="input-field" style="padding: 6px; font-size: 0.82rem;">
+                        {% for range_name, fee in delivery_ranges.items() %}
+                          <option value="{{ range_name }}" {% if item.delivery_range == range_name %}selected{% endif %}>{{ range_name }} (+₹{{ '%.0f'|format(fee) }})</option>
+                        {% endfor %}
+                      </select>
+                    </td>
+                    <td><strong style="color: var(--primary);">₹{{ "%.2f"|format(item.item_total) }}</strong></td>
+                    <td>
+                      <button type="submit" form="remove-form-{{ item.produce_id }}" class="btn btn-sm" style="background: #c5221f; padding: 4px 8px; font-size: 0.78rem;" data-i18n="btn_remove">Remove</button>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+            <button type="submit" class="btn btn-alt btn-sm" data-i18n="btn_update_cart">🔄 Update Cart Quantities</button>
+          </div>
+        </div>
+
+        <!-- Order Summary Box -->
+        <div class="action-card" style="margin-top: 0; background: #ffffff;">
+          <h3 style="color: var(--dark); font-size: 1.15rem; margin-bottom: 16px;" data-i18n="order_summary_title">Order & Freight Summary</h3>
+          
+          <div style="display: flex; justify-content: space-between; font-size: 0.95rem; color: var(--muted); margin-bottom: 8px;">
+            <span data-i18n="subtotal_lbl">Produce Subtotal:</span>
+            <span style="font-weight: 700; color: var(--dark);">₹{{ "%.2f"|format(subtotal) }}</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; font-size: 0.95rem; color: var(--muted); margin-bottom: 14px;">
+            <span data-i18n="delivery_fee_lbl">Rangewise Freight Total:</span>
+            <span style="font-weight: 700; color: var(--primary);">₹{{ "%.2f"|format(delivery_fee) }}</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 2px dashed var(--border); margin-bottom: 20px;">
+            <span style="font-weight: 800; color: var(--dark); font-size: 1.05rem;" data-i18n="grand_total_lbl">Grand Total:</span>
+            <span style="font-size: 1.6rem; font-weight: 800; color: var(--primary);">₹{{ "%.2f"|format(grand_total) }}</span>
+          </div>
+
+          {% if session.get('role') == 'buyer' %}
+            <a href="{{ url_for('checkout') }}" class="btn" style="width: 100%;" data-i18n="btn_proceed_checkout">Proceed to Checkout & Pay →</a>
+          {% else %}
+            <a href="{{ url_for('login') }}" class="btn" style="width: 100%;" data-i18n="btn_login_to_checkout">Sign In to Checkout & Pay</a>
+          {% endif %}
+        </div>
+      </div>
+    </form>
+
+    {% for item in cart_items %}
+      <form id="remove-form-{{ item.produce_id }}" action="{{ url_for('remove_from_cart', produce_id=item.produce_id) }}" method="POST" style="display: none;"></form>
+    {% endfor %}
+
+  {% else %}
+    <div style="text-align: center; padding: 60px; background: #ffffff; border-radius: 20px; border: 1px solid var(--border);">
+      <div style="font-size: 4rem; margin-bottom: 12px;">🛒</div>
+      <h3 style="color: var(--dark); font-size: 1.4rem;" data-i18n="empty_cart_title">Your Cart is Currently Empty</h3>
+      <p style="color: var(--muted); margin-top: 6px;" data-i18n="empty_cart_desc">Explore harvest fresh produce from local farmers and add them to your cart.</p>
+      <a href="{{ url_for('index') }}" class="btn style='margin-top: 20px;'" data-i18n="btn_explore_now">Browse Produce Marketplace</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

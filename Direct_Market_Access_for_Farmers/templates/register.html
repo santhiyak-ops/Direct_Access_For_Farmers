@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Join FarmDirect | Register{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <h2 data-i18n="register_title">Create an Account</h2>
+    <p data-i18n="register_sub">Join as a Farmer, Buyer, or Agricultural Trader</p>
+
+    <form action="{{ url_for('register') }}" method="POST">
+      <div class="form-group">
+        <label for="name">Full Name / Farm / Business Name</label>
+        <input type="text" id="name" name="name" class="input-field" placeholder="e.g. Ramakrishnan Farmer" required>
+      </div>
+
+      <div class="form-group">
+        <label for="role">Account Role</label>
+        <select id="role" name="role" class="input-field" required>
+          <option value="farmer">🌾 Farmer / Crop Producer</option>
+          <option value="buyer">🛒 Buyer / Wholesale Retailer / Consumer</option>
+          <option value="admin">🛡️ Agricultural Administrator</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" class="input-field" placeholder="name@example.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Mobile Number</label>
+        <input type="tel" id="phone" name="phone" class="input-field" placeholder="+91 9876543210">
+      </div>
+
+      <div class="form-group">
+        <label for="location">District & State Location</label>
+        <input type="text" id="location" name="location" class="input-field" placeholder="e.g. Kovilpatti, Tamil Nadu">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" class="input-field" placeholder="Create a strong password" required>
+      </div>
+
+      <button type="submit" class="btn" style="width: 100%; margin-top: 10px;" data-i18n="btn_register">Complete Registration</button>
+    </form>
+
+    <div style="margin-top: 20px; text-align: center; font-size: 0.88rem; color: var(--muted);">
+      Already registered? <a href="{{ url_for('login') }}" style="color: var(--primary); font-weight: 700;">Sign In Here</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

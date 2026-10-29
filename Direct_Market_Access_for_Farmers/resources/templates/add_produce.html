@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}List New Harvest Produce | FarmDirect{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper" style="padding-top: 50px;">
+  <div class="auth-card" style="max-width: 650px;">
+    <span class="badge">FARMER LISTING FORM</span>
+    <h2>🌾 List New Harvest Produce</h2>
+    <p>Add crop details, stock quantity, pricing, and location to connect with direct buyers.</p>
+
+    <form action="{{ url_for('add_produce') }}" method="POST">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="form-group" style="grid-column: 1 / -1;">
+          <label for="name">Crop / Produce Name</label>
+          <input type="text" id="name" name="name" class="input-field" placeholder="e.g. Organic Red Tomatoes, Samba Paddy Rice" required>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Category</label>
+          <select id="category" name="category" class="input-field" required>
+            <option value="Vegetables">🥦 Vegetables</option>
+            <option value="Grains & Cereals">🌾 Grains & Cereals</option>
+            <option value="Fruits">🍎 Fruits</option>
+            <option value="Pulses">🫘 Pulses & Beans</option>
+            <option value="Dairy & Livestock">🥛 Dairy & Livestock</option>
+            <option value="Spices & Herbs">🌶️ Spices & Herbs</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="unit">Unit Measurement</label>
+          <select id="unit" name="unit" class="input-field" required>
+            <option value="kg">Kilogram (kg)</option>
+            <option value="Quintal">Quintal (100 kg)</option>
+            <option value="Ton">Ton (1000 kg)</option>
+            <option value="Litre">Litre</option>
+            <option value="Bag">Bag / Sack</option>
+            <option value="Box">Box / Crate</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="quantity">Available Stock Quantity</label>
+          <input type="number" step="0.1" id="quantity" name="quantity" class="input-field" placeholder="e.g. 150" required>
+        </div>
+
+        <div class="form-group">
+          <label for="price">Direct Price per Unit (₹)</label>
+          <input type="number" step="0.5" id="price" name="price" class="input-field" placeholder="e.g. 45.00" required>
+        </div>
+
+        <div class="form-group" style="grid-column: 1 / -1;">
+          <label for="location">Farm Location (Village / District / State)</label>
+          <input type="text" id="location" name="location" class="input-field" placeholder="e.g. Kovilpatti, Thoothukudi, Tamil Nadu" required>
+        </div>
+
+        <div class="form-group" style="grid-column: 1 / -1;">
+          <label for="description">Produce Description & Quality Notes</label>
+          <textarea id="description" name="description" class="input-field" rows="3" placeholder="Describe farming methods (e.g., organic, pesticide-free, fresh harvested date)..."></textarea>
+        </div>
+
+        <div class="form-group" style="grid-column: 1 / -1;">
+          <label for="image_url">Crop Display Emoji / Icon</label>
+          <input type="text" id="image_url" name="image_url" class="input-field" placeholder="e.g. 🍅, 🌾, 🧅, 🥭, 🫘, 🥛">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 14px; margin-top: 15px;">
+        <button type="submit" class="btn" style="flex: 1;">Publish Listing to Marketplace</button>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-alt">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

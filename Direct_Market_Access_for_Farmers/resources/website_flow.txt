@@ -1,0 +1,8 @@
+HOME -> Marketplace -> Produce Details -> Live Total Calculator
+                    |-> Buy Direct
+                    |-> Negotiate Price / Submit Offer
+                    |-> Government Schemes Portal -> Official Links
+
+FARMER -> Login -> Dashboard -> Add Produce -> Manage Price Offers -> View Orders
+BUYER  -> Login -> Dashboard -> Browse Crops -> Place Order / Submit Offer
+ADMIN  -> Login -> Control Center -> Registered Users / Moderate Crops / Seed Data

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Admin Control Center | FarmDirect{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="dash-header">
+    <div class="dash-title">
+      <span class="badge" style="background: #fce8e6; color: #c5221f;">ADMINISTRATOR PORTAL</span>
+      <h1>System Control Center</h1>
+      <p style="color: var(--muted); font-size: 0.95rem;">Monitor registered users, marketplace listings, direct transactions, and system health.</p>
+    </div>
+    <a href="{{ url_for('seed') }}" class="btn btn-alt">🌱 Re-seed Demo Data</a>
+  </div>
+
+  <!-- Metrics Grid -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <p>👥 Registered Users</p>
+      <h3>{{ users|length }} Users</h3>
+    </div>
+    <div class="metric-card">
+      <p>🌾 Total Marketplace Items</p>
+      <h3>{{ produce|length }} Crops</h3>
+    </div>
+    <div class="metric-card">
+      <p>📦 Total Platform Orders</p>
+      <h3>{{ orders|length }} Orders</h3>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="data-panel">
+    <h2>👥 Platform Registered Users</h2>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Phone</th>
+            <th>Location</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+            <tr>
+              <td>#USR-{{ u.id }}</td>
+              <td><strong>{{ u.name }}</strong></td>
+              <td>{{ u.email }}</td>
+              <td><span class="status-badge status-{{ 'available' if u.role=='farmer' else 'pending' }}">{{ u.role|upper }}</span></td>
+              <td>{{ u.phone or 'N/A' }}</td>
+              <td>📍 {{ u.location or 'N/A' }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- All Produce Listings -->
+  <div class="data-panel">
+    <h2>🌾 Marketplace All Produce Listings</h2>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Crop ID</th>
+            <th>Name</th>
+            <th>Farmer</th>
+            <th>Category</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Location</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in produce %}
+            <tr>
+              <td>#CRP-{{ p.id }}</td>
+              <td><strong>{{ p.name }}</strong></td>
+              <td>👨‍🌾 {{ p.farmer_name }}</td>
+              <td>{{ p.category }}</td>
+              <td>{{ p.quantity }} {{ p.unit }}</td>
+              <td>₹{{ "%.2f"|format(p.price) }} / {{ p.unit }}</td>
+              <td>📍 {{ p.location }}</td>
+              <td><span class="status-badge status-available">{{ p.status }}</span></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
